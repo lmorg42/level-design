@@ -1,1 +1,4 @@
 BITMAP, SewerBlocks, bts_tiles.png, 64, 64, 2, 3, 6
+BITMAP, 16TestBlocks, 16_test_sprites.png, 16, 16, 6, 4, 24
+BITMAP, 32TestBlocks, 32_test_sprites.png, 32, 32, 6, 4, 24
+BITMAP, pipeTiles, pipes_64.png, 64, 64, 4, 11, 43
