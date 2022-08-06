@@ -15,4 +15,6 @@ Visually Build levels
 
 **P Key** - Switch between blocks and pipes
 
+**Alt Key** - Hold down to move the camera, release to stop
+
 File will be called file.txt

@@ -4,12 +4,12 @@
 #include <vector>
 
 #define SCREEN_WIDTH 1600
-#define SCREEN_HEIGHT 896
+#define SCREEN_HEIGHT 900
 
 //Make these divisible by (16/32/64) depending on tile size used
 //Gives extra size to the screen, for use with non-static camera
-#define SCREEN_WIDTH_EXTRA 0
-#define SCREEN_HEIGHT_EXTRA 0
+#define SCREEN_WIDTH_EXTRA 512 * 10
+#define SCREEN_HEIGHT_EXTRA 512
 
 void write_out_level_to_file(string file, vector<vector<Tile>> tiles)
 {
@@ -25,10 +25,18 @@ void write_out_level_to_file(string file, vector<vector<Tile>> tiles)
     level.close();
 }
 
+void update_camera(vector_2d mouse_coordinates)
+{
+    if (key_down(LEFT_ALT_KEY))
+    {
+        move_camera_by(mouse_coordinates.x * -1, mouse_coordinates.y * -1);
+    }  
+}
+
 int main()
 {
     load_resource_bundle("game_resources", "gameresources.txt");
-    open_window("Level Design", SCREEN_WIDTH + SCREEN_WIDTH_EXTRA, SCREEN_HEIGHT + SCREEN_HEIGHT_EXTRA);
+    open_window("Level Design", SCREEN_WIDTH, SCREEN_HEIGHT);
 
     bitmap blocks = bitmap_named("SewerBlocks");
     string type = "block";
@@ -47,6 +55,7 @@ int main()
 
     drawing_options opts = option_defaults();
     opts.draw_cell = 0;
+    opts.camera = DRAW_TO_SCREEN;
 
     vector<vector<Tile>> tiles;
     for(int j = 0; j < (SCREEN_HEIGHT + SCREEN_HEIGHT_EXTRA)/tile_size; j++)
@@ -134,6 +143,8 @@ int main()
         }
 
         point_2d current_mouse_position = mouse_position();
+        
+        update_camera(mouse_movement());
 
         if(tile_selection > 0)
             draw_bitmap(current_selection, current_mouse_position.x, current_mouse_position.y, opts);
