@@ -13,4 +13,6 @@ Visually Build levels
 
 **A Key** - Write out level to text file
 
+**P Key** - Switch between blocks and pipes
+
 File will be called file.txt
