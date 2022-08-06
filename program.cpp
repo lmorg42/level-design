@@ -8,8 +8,8 @@
 
 //Make these divisible by (16/32/64) depending on tile size used
 //Gives extra size to the screen, for use with non-static camera
-#define SCREEN_WIDTH_EXTRA 512 * 10
-#define SCREEN_HEIGHT_EXTRA 512
+#define SCREEN_WIDTH_EXTRA 64 * 0
+#define SCREEN_HEIGHT_EXTRA 64 * 0
 
 void write_out_level_to_file(string file, vector<vector<Tile>> tiles)
 {

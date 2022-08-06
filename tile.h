@@ -41,8 +41,12 @@ class Tile
         void check_input(int tile_selected, string type)
         {
             point_2d pt = mouse_position();
+            point_2d camera = camera_position();
             drawing_options opts;
             int multiplier = 1;
+
+            pt.x = pt.x + camera.x;
+            pt.y = pt.y + camera.y;
 
             if(type == "block")
                 opts = this->opts_block;
