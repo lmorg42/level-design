@@ -4,7 +4,7 @@
 #include <vector>
 
 #define SCREEN_WIDTH 1600
-#define SCREEN_HEIGHT 900
+#define SCREEN_HEIGHT 896
 
 //Make these divisible by (16/32/64) depending on tile size used
 //Gives extra size to the screen, for use with non-static camera
