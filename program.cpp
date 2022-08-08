@@ -6,8 +6,8 @@
 #define SCREEN_WIDTH 1600
 #define SCREEN_HEIGHT 896
 
-//Make these divisible by (16/32/64) depending on tile size used
 //Gives extra size to the screen, for use with non-static camera
+//Multiply by tile size of the map
 #define SCREEN_WIDTH_EXTRA 64 * 0
 #define SCREEN_HEIGHT_EXTRA 64 * 0
 
@@ -33,31 +33,13 @@ void update_camera(vector_2d mouse_coordinates)
     }  
 }
 
-int main()
+vector<vector<Tile>> make_layer(int tile_size, bitmap blocks, bitmap pipes)
 {
-    load_resource_bundle("game_resources", "gameresources.txt");
-    open_window("Level Design", SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    bitmap blocks = bitmap_named("SewerBlocks");
-    string type = "block";
-    //bitmap image = bitmap_named("16TestBlocks");
-    //bitmap image = bitmap_named("32TestBlocks");
-    bitmap pipes = bitmap_named("pipeTiles");
-    bitmap current_selection = blocks;
-    bool draw_pipes = false;
-
+    vector<vector<Tile>> tiles;
     point_2d origin;
     origin.x = 0;
     origin.y = 0;
 
-    int tile_size = 64;
-    int tile_selection = 1;
-
-    drawing_options opts = option_defaults();
-    opts.draw_cell = 0;
-    opts.camera = DRAW_TO_SCREEN;
-
-    vector<vector<Tile>> tiles;
     for(int j = 0; j < (SCREEN_HEIGHT + SCREEN_HEIGHT_EXTRA)/tile_size; j++)
     {
         vector<Tile> row;
@@ -72,41 +54,101 @@ int main()
         tiles.push_back(row);
     }
 
+    return tiles;
+}
+
+void draw_tiles(vector<vector<Tile>> tiles)
+{
+    for(int i = 0; i < tiles.size(); i++)
+    {
+        for(int j = 0; j < tiles[i].size(); j++)
+            tiles[i][j].draw_tile();
+    }
+}
+
+vector<vector<Tile>> check_tile_input(vector<vector<Tile>> tiles, int tile_selection, string type)
+{
+    for(int i = 0; i < tiles.size(); i++)
+    {
+        for(int j = 0; j < tiles[i].size(); j++)
+                tiles[i][j].check_input(tile_selection, type);
+    }
+
+    return tiles;
+}
+
+int main()
+{
+    load_resource_bundle("game_resources", "gameresources.txt");
+    open_window("Level Design", SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    bitmap blocks = bitmap_named("SewerBlocks");
+    string type = "block";
+    bitmap pipes = bitmap_named("pipeTiles");
+    bitmap current_selection = blocks;
+
+    int layers = 2;
+    int current_layer = 1;
+
+    int tile_size = 64;
+    int tile_selection = 1;
+
+    drawing_options opts = option_defaults();
+    opts.draw_cell = 0;
+    opts.camera = DRAW_TO_SCREEN;
+
+    vector<vector<Tile>> tiles = make_layer(tile_size, blocks, pipes);
+    vector<vector<Tile>> tiles_2;
+
+    if(layers == 2)
+        tiles_2 = make_layer(tile_size, blocks, pipes);
+
     while(!key_typed(ESCAPE_KEY))
     {
         clear_screen(COLOR_BLACK);
+
+        draw_tiles(tiles);
+
+        if(layers == 2)
+            draw_tiles(tiles_2);
         
-        for(int i = 0; i < tiles.size(); i++)
+
+        if(current_layer == 1)
+            tiles = check_tile_input(tiles, tile_selection, type);
+        else
+            tiles_2 = check_tile_input(tiles_2, tile_selection, type);
+
+        if(layers == 2)
         {
-            for(int j = 0; j < tiles[i].size(); j++)
+            if(key_typed(L_KEY))
             {
-                tiles[i][j].draw_tile();
-                tiles[i][j].check_input(tile_selection, type);
+                if(current_layer == 1)
+                    current_layer = 2;
+                else
+                    current_layer = 1;
             }
         }
 
         if(key_typed(A_KEY))
         {
             write_out_level_to_file("file.txt", tiles);
+
+            if(layers == 2)
+                write_out_level_to_file("file2.txt", tiles_2);
         }
 
         if(key_typed(P_KEY))
         {
-            write_line("Switching tiles");
-            if(!draw_pipes)
+            if(type == "block")
             {
-                write_line("Draw Pipes");
                 type = "pipe";
-                draw_pipes = true;
                 tile_selection = 1;
                 current_selection = pipes;
                 opts.draw_cell = 0;
             }
             else
             {
-                write_line("Draw Blocks");
                 type = "block";
-                draw_pipes = false;
                 tile_selection = 1;
                 current_selection = blocks;
                 opts.draw_cell = 0;
@@ -148,14 +190,11 @@ int main()
 
         if(tile_selection > 0)
             draw_bitmap(current_selection, current_mouse_position.x, current_mouse_position.y, opts);
-
-
         
         process_events();
         refresh_screen(60);
     }
 
     free_resource_bundle("game_resources");
-
     return 0;
 }

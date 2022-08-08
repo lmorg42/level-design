@@ -43,7 +43,7 @@ class Tile
             point_2d pt = mouse_position();
             point_2d camera = camera_position();
             drawing_options opts;
-            int multiplier = 1;
+            int multiplier = 0;
 
             pt.x = pt.x + camera.x;
             pt.y = pt.y + camera.y;
