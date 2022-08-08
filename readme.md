@@ -13,8 +13,13 @@ Visually Build levels
 
 **A Key** - Write out level to text file
 
+Layer 1 will be called file.txt
+
+Layer 2 will be called file2.txt
+
 **P Key** - Switch between blocks and pipes
+
+**L Key** - Switch between layers
 
 **Alt Key** - Hold down to move the camera, release to stop
 
-File will be called file.txt
