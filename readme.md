@@ -29,3 +29,5 @@ and so on
 
 **Alt Key** - Hold down to move the camera, release to stop
 
+**H KEY** - Turn on/off the HUD
+
