@@ -83,6 +83,7 @@ int main()
     vector<string> cell_sheet_names;
     
     cell_sheet_names.push_back("Solid");
+    cell_sheet_names.push_back("NonSolid");
     cell_sheet_names.push_back("Pipe");
     cell_sheet_names.push_back("Water");
     cell_sheet_names.push_back("Toxic");
