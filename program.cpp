@@ -1,5 +1,6 @@
 #include "splashkit.h"
 #include "tile.h"
+#include "cellsheet.h"
 #include <fstream>
 #include <vector>
 
@@ -33,7 +34,7 @@ void update_camera(vector_2d mouse_coordinates)
     }  
 }
 
-vector<vector<Tile>> make_layer(int tile_size, bitmap blocks, bitmap pipes)
+vector<vector<Tile>> make_layer(int tile_size, bitmap initial_bitmap)
 {
     vector<vector<Tile>> tiles;
     point_2d origin;
@@ -47,7 +48,7 @@ vector<vector<Tile>> make_layer(int tile_size, bitmap blocks, bitmap pipes)
         {
             origin.x = 0 + (i * tile_size);
             origin.y = 0 + (j * tile_size);
-            Tile test(blocks, pipes, origin, tile_size);
+            Tile test(initial_bitmap, origin, tile_size);
             row.push_back(test);
         }
 
@@ -57,38 +58,41 @@ vector<vector<Tile>> make_layer(int tile_size, bitmap blocks, bitmap pipes)
     return tiles;
 }
 
-void draw_tiles(vector<vector<Tile>> tiles)
+vector<CellSheet> make_cell_sheets(vector<string> cell_sheet_names)
 {
-    for(int i = 0; i < tiles.size(); i++)
-    {
-        for(int j = 0; j < tiles[i].size(); j++)
-            tiles[i][j].draw_tile();
-    }
-}
+    vector<CellSheet> cell_sheets;
 
-vector<vector<Tile>> check_tile_input(vector<vector<Tile>> tiles, int tile_selection, string type)
-{
-    for(int i = 0; i < tiles.size(); i++)
+    int offset = 0;
+    for(int i = 0; i < cell_sheet_names.size(); i++)
     {
-        for(int j = 0; j < tiles[i].size(); j++)
-                tiles[i][j].check_input(tile_selection, type);
+        bitmap new_bitmap = bitmap_named(cell_sheet_names[i]);
+        CellSheet new_type(new_bitmap, cell_sheet_names[i], offset);
+        offset += new_type.number_of_cells;
+        cell_sheets.push_back(new_type);
     }
 
-    return tiles;
+    return cell_sheets;
 }
 
 int main()
 {
     load_resource_bundle("game_resources", "gameresources.txt");
     open_window("Level Design", SCREEN_WIDTH, SCREEN_HEIGHT);
+    bool hud = true;
 
-    bitmap blocks = bitmap_named("SewerBlocks");
-    string type = "block";
-    bitmap pipes = bitmap_named("pipeTiles");
-    bitmap current_selection = blocks;
+    vector<string> cell_sheet_names;
+    
+    cell_sheet_names.push_back("Solid");
+    cell_sheet_names.push_back("Pipe");
+    cell_sheet_names.push_back("Water");
+    cell_sheet_names.push_back("Toxic");
+
+    vector<CellSheet> cell_sheets = make_cell_sheets(cell_sheet_names);
+
+    int cell_sheet_selection = 0;
 
     int layers = 2;
-    int current_layer = 1;
+    int current_layer = 0;
 
     int tile_size = 64;
     int tile_selection = 1;
@@ -97,65 +101,87 @@ int main()
     opts.draw_cell = 0;
     opts.camera = DRAW_TO_SCREEN;
 
-    vector<vector<Tile>> tiles = make_layer(tile_size, blocks, pipes);
-    vector<vector<Tile>> tiles_2;
+    vector<vector<vector<Tile>>> all_layers;
 
-    if(layers == 2)
-        tiles_2 = make_layer(tile_size, blocks, pipes);
+    for(int i = 0; i < layers; i++)
+    {
+        vector<vector<Tile>> tiles = make_layer(tile_size, cell_sheets[cell_sheet_selection].cells);
+        all_layers.push_back(tiles);
+    }
 
     while(!key_typed(ESCAPE_KEY))
     {
         clear_screen(COLOR_BLACK);
 
-        draw_tiles(tiles);
 
-        if(layers == 2)
-            draw_tiles(tiles_2);
-        
-
-        if(current_layer == 1)
-            tiles = check_tile_input(tiles, tile_selection, type);
-        else
-            tiles_2 = check_tile_input(tiles_2, tile_selection, type);
-
-        if(layers == 2)
+        for(int i = 0; i < all_layers[current_layer].size(); i++)
         {
-            if(key_typed(L_KEY))
+            for(int j = 0; j < all_layers[current_layer][i].size(); j++)
             {
-                if(current_layer == 1)
-                    current_layer = 2;
-                else
-                    current_layer = 1;
+                all_layers[current_layer][i][j].check_input(tile_selection, cell_sheets[cell_sheet_selection].cells, cell_sheets[cell_sheet_selection].offset);
             }
+        }
+            
+        for(int i = 0; i < all_layers.size(); i++)
+        {
+            for(int j = 0; j < all_layers[i].size(); j++)
+            {
+                for(int k = 0; k < all_layers[i][j].size(); k++)
+                {
+                    all_layers[i][j][k].draw_tile();
+                }
+            }
+        }
+
+        if(key_typed(W_KEY))
+        {
+            if(current_layer < all_layers.size() - 1)
+                current_layer += 1;
+        }
+
+        if(key_typed(Q_KEY))
+        {
+            if(current_layer > 0)
+                current_layer -= 1;
         }
 
         if(key_typed(A_KEY))
         {
-            write_out_level_to_file("file.txt", tiles);
-
-            if(layers == 2)
-                write_out_level_to_file("file2.txt", tiles_2);
+            for(int i = 0; i < all_layers.size(); i++)
+            {
+                string file = "file" + std::to_string(i) + ".txt";
+                write_out_level_to_file(file, all_layers[i]);
+            }
         }
 
-        if(key_typed(P_KEY))
+        if(key_typed(H_KEY))
         {
-            if(type == "block")
+            if(hud)
+                hud = false;
+            else
+                hud = true;
+        }
+
+        if(key_typed(NUM_2_KEY))
+        {
+            if(cell_sheet_selection < cell_sheets.size() - 1)
             {
-                type = "pipe";
+                cell_sheet_selection += 1;
                 tile_selection = 1;
-                current_selection = pipes;
                 opts.draw_cell = 0;
             }
-            else
+        }
+        if(key_typed(NUM_1_KEY))
+        {
+            if(cell_sheet_selection > 0)
             {
-                type = "block";
+                cell_sheet_selection -= 1;
                 tile_selection = 1;
-                current_selection = blocks;
                 opts.draw_cell = 0;
             }
         }
 
-        if(key_typed(UP_KEY))
+        if(key_typed(UP_KEY) || mouse_wheel_scroll().y > 0)
         {
             tile_selection += 1;
             opts.draw_cell += 1;
@@ -165,21 +191,21 @@ int main()
                 opts.draw_cell = 0;
             }
 
-            if(tile_selection > bitmap_cell_count(current_selection))
+            if(tile_selection > bitmap_cell_count(cell_sheets[cell_sheet_selection].cells))
             {
-                tile_selection = bitmap_cell_count(current_selection);
-                opts.draw_cell = bitmap_cell_count(current_selection) - 1;
+                tile_selection = bitmap_cell_count(cell_sheets[cell_sheet_selection].cells);
+                opts.draw_cell = bitmap_cell_count(cell_sheets[cell_sheet_selection].cells) - 1;
             }
         }
 
-        if(key_typed(DOWN_KEY))
+        if(key_typed(DOWN_KEY) || mouse_wheel_scroll().y < 0)
         {
             tile_selection -= 1;
             opts.draw_cell -= 1;
 
-            if(tile_selection < 0)
+            if(tile_selection == 0 || tile_selection < 0)
             {
-                tile_selection = 0;
+                tile_selection = 1;
                 opts.draw_cell = 0;
             }
         }
@@ -188,8 +214,14 @@ int main()
         
         update_camera(mouse_movement());
 
+        if(hud)
+        {
+            draw_text("Current Cell Sheet: " + cell_sheets[cell_sheet_selection].type, COLOR_WHITE, "basicFont", 20, 0, 0, opts);
+            draw_text("Current Layer: " + std::to_string(current_layer + 1), COLOR_WHITE, "basicFont", 20, 0, 20, opts);
+        }
+
         if(tile_selection > 0)
-            draw_bitmap(current_selection, current_mouse_position.x, current_mouse_position.y, opts);
+            draw_bitmap(cell_sheets[cell_sheet_selection].cells, current_mouse_position.x, current_mouse_position.y, opts);
         
         process_events();
         refresh_screen(60);
