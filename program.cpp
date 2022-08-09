@@ -87,8 +87,12 @@ int main()
     cell_sheet_names.push_back("Pipe");
     cell_sheet_names.push_back("Water");
     cell_sheet_names.push_back("Toxic");
-
+    
+    //Players have a specific offset
     vector<CellSheet> cell_sheets = make_cell_sheets(cell_sheet_names);
+    bitmap new_bitmap = bitmap_named("Players");
+    CellSheet new_type(new_bitmap, "Players", 908);
+    cell_sheets.push_back(new_type);
 
     int cell_sheet_selection = 0;
 
