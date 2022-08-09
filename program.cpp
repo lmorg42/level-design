@@ -9,8 +9,8 @@
 
 //Gives extra size to the screen, for use with non-static camera
 //Multiply by tile size of the map
-#define SCREEN_WIDTH_EXTRA 64 * 0
-#define SCREEN_HEIGHT_EXTRA 64 * 0
+#define SCREEN_WIDTH_EXTRA 64 * 10
+#define SCREEN_HEIGHT_EXTRA 64 * 10
 
 void write_out_level_to_file(string file, vector<vector<Tile>> tiles)
 {
@@ -34,17 +34,17 @@ void update_camera(vector_2d mouse_coordinates)
     }  
 }
 
-vector<vector<Tile>> make_layer(int tile_size, bitmap initial_bitmap)
+vector<vector<Tile>> make_layer(int tile_size, bitmap initial_bitmap, int extra_width, int extra_height)
 {
     vector<vector<Tile>> tiles;
     point_2d origin;
     origin.x = 0;
     origin.y = 0;
 
-    for(int j = 0; j < (SCREEN_HEIGHT + SCREEN_HEIGHT_EXTRA)/tile_size; j++)
+    for(int j = 0; j < (SCREEN_HEIGHT + extra_height)/tile_size; j++)
     {
         vector<Tile> row;
-        for(int i = 0; i < (SCREEN_WIDTH + SCREEN_WIDTH_EXTRA)/tile_size; i++)
+        for(int i = 0; i < (SCREEN_WIDTH + extra_width)/tile_size; i++)
         {
             origin.x = 0 + (i * tile_size);
             origin.y = 0 + (j * tile_size);
@@ -74,7 +74,7 @@ vector<CellSheet> make_cell_sheets(vector<string> cell_sheet_names)
     return cell_sheets;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     load_resource_bundle("game_resources", "gameresources.txt");
     open_window("Level Design", SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -97,10 +97,43 @@ int main()
     int cell_sheet_selection = 0;
 
     int layers = 2;
+    int tile_size = 64;
+    int extra_width =  tile_size * 0;
+    int extra_height =  tile_size * 0;
+    string file_name = "file";
+    
+
+    int tile_selection = 1;
     int current_layer = 0;
 
-    int tile_size = 64;
-    int tile_selection = 1;
+    std::vector<std::string> args(argv, argv+argc);
+
+    try
+    {
+        for (size_t i = 1; i < args.size(); ++i) 
+        {
+            if (args[i] == "-l") 
+                layers = std::stoi(args[i + 1]);
+
+            if (args[i] == "-t") 
+                tile_size = std::stoi(args[i + 1]);
+            
+            if (args[i] == "-xh") 
+                extra_height = tile_size * std::stoi(args[i + 1]);
+
+            if (args[i] == "-xw") 
+                extra_width = std::stoi(args[i + 1]);
+            
+            if (args[i] == "-f") 
+                file_name = args[i + 1];
+        }
+    }
+    catch(const std::exception& e)
+    {
+        write_line(e.what());
+        write_line("Closing program");
+        exit(1);
+    }
 
     drawing_options opts = option_defaults();
     opts.draw_cell = 0;
@@ -110,7 +143,7 @@ int main()
 
     for(int i = 0; i < layers; i++)
     {
-        vector<vector<Tile>> tiles = make_layer(tile_size, cell_sheets[cell_sheet_selection].cells);
+        vector<vector<Tile>> tiles = make_layer(tile_size, cell_sheets[cell_sheet_selection].cells, extra_width, extra_height);
         all_layers.push_back(tiles);
     }
 
@@ -154,7 +187,7 @@ int main()
         {
             for(int i = 0; i < all_layers.size(); i++)
             {
-                string file = "file" + std::to_string(i) + ".txt";
+                string file = file_name + std::to_string(i) + ".txt";
                 write_out_level_to_file(file, all_layers[i]);
             }
         }
