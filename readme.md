@@ -31,3 +31,15 @@ and so on
 
 **H KEY** - Turn on/off the HUD
 
+
+## Command Line Arguments ##
+
+**-l** - Change number of layers (eg: -l 2)
+
+**-t** - Change Tile size (eg: 16, 32, 64  -t 64)
+
+**-f** - Change output filename (eg: -f level)
+
+**-xh** - Add extra height to map (eg: -xh 10)
+
+**-xw** - Add extra width to map (eg: -xw 10)
