@@ -5,5 +5,6 @@ BITMAP, Pipe, pipes_64.png, 64, 64, 4, 11, 43
 BITMAP, Water, water_blocks.png, 64, 64, 2, 1, 2
 BITMAP, Toxic, toxic_blocks.png, 64, 64, 1, 1, 1
 BITMAP, Players, players.png, 32, 64, 2, 1, 2
+BITMAP, Door, doors.png, 64, 64, 1, 1, 1
 
 FONT, basicFont, ARIAL.TTF

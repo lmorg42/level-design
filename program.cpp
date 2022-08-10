@@ -90,9 +90,14 @@ int main(int argc, char *argv[])
     
     //Players have a specific offset
     vector<CellSheet> cell_sheets = make_cell_sheets(cell_sheet_names);
-    bitmap new_bitmap = bitmap_named("Players");
-    CellSheet new_type(new_bitmap, "Players", 908);
-    cell_sheets.push_back(new_type);
+
+    bitmap bitmap_players = bitmap_named("Players");
+    CellSheet player_type(bitmap_players, "Players", 908);
+    cell_sheets.push_back(player_type);
+
+    bitmap bitmap_door = bitmap_named("Door");
+    CellSheet door_type(bitmap_door, "Door", 807);
+    cell_sheets.push_back(door_type);
 
     int cell_sheet_selection = 0;
 
