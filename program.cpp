@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     vector<string> cell_sheet_names;
     
     cell_sheet_names.push_back("Solid");
-    cell_sheet_names.push_back("NonSolid");
+    cell_sheet_names.push_back("Ladder");
     cell_sheet_names.push_back("Pipe");
     cell_sheet_names.push_back("Water");
     cell_sheet_names.push_back("Toxic");
@@ -98,6 +98,11 @@ int main(int argc, char *argv[])
     bitmap bitmap_door = bitmap_named("Door");
     CellSheet door_type(bitmap_door, "Door", 807);
     cell_sheets.push_back(door_type);
+
+    bitmap bitmap_roach = bitmap_named("Roach");
+    CellSheet roach_type(bitmap_roach, "Roach", 706);
+    cell_sheets.push_back(roach_type);
+
 
     int cell_sheet_selection = 0;
 
