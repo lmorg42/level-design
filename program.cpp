@@ -87,6 +87,9 @@ int main(int argc, char *argv[])
     cell_sheet_names.push_back("Pipe");
     cell_sheet_names.push_back("Water");
     cell_sheet_names.push_back("Toxic");
+    cell_sheet_names.push_back("HoldPipes");
+    cell_sheet_names.push_back("TurnPipes");
+    cell_sheet_names.push_back("Empty");
     
     //Players have a specific offset
     vector<CellSheet> cell_sheets = make_cell_sheets(cell_sheet_names);
@@ -132,7 +135,7 @@ int main(int argc, char *argv[])
                 extra_height = tile_size * std::stoi(args[i + 1]);
 
             if (args[i] == "-xw") 
-                extra_width = std::stoi(args[i + 1]);
+                extra_width = tile_size * std::stoi(args[i + 1]);
             
             if (args[i] == "-f") 
                 file_name = args[i + 1];
