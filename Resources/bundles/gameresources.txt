@@ -9,6 +9,6 @@ BITMAP, Door, doors.png, 64, 64, 1, 1, 1
 BITMAP, Roach, Roach_le.png, 64, 32, 1, 2, 2
 BITMAP, HoldPipes, holdable_pipes.png, 64, 64, 6, 3, 18
 BITMAP, TurnPipes, turn_pipes.png, 64, 64, 2, 6, 6
-BITMAP, Empty, empty_block_le.png, 64, 64, 1, 1, 1
+BITMAP, Empty, holdable_pipes_empty_le.png, 64, 64, 6, 3, 18
 
 FONT, basicFont, ARIAL.TTF
