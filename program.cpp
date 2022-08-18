@@ -67,7 +67,7 @@ vector<CellSheet> make_cell_sheets(vector<string> cell_sheet_names)
     {
         bitmap new_bitmap = bitmap_named(cell_sheet_names[i]);
         CellSheet new_type(new_bitmap, cell_sheet_names[i], offset);
-        offset += new_type.number_of_cells;
+        offset += 100; //Could be higher if sheets get bigger
         cell_sheets.push_back(new_type);
     }
 
@@ -82,30 +82,23 @@ int main(int argc, char *argv[])
 
     vector<string> cell_sheet_names;
     
-    cell_sheet_names.push_back("Solid");
-    cell_sheet_names.push_back("Ladder");
-    cell_sheet_names.push_back("Pipe");
-    cell_sheet_names.push_back("Water");
-    cell_sheet_names.push_back("Toxic");
-    cell_sheet_names.push_back("HoldPipes");
-    cell_sheet_names.push_back("TurnPipes");
-    cell_sheet_names.push_back("Empty");
-    
-    //Players have a specific offset
+    cell_sheet_names.push_back("Solid"); //0
+    cell_sheet_names.push_back("HalfBlocksTop"); //100
+    cell_sheet_names.push_back("HalfBlocksBottom"); //200
+    cell_sheet_names.push_back("Ladder"); //300
+    cell_sheet_names.push_back("Pipe"); //400
+    cell_sheet_names.push_back("Water"); //500
+    cell_sheet_names.push_back("Toxic"); //600
+    cell_sheet_names.push_back("HoldPipes"); //700
+    cell_sheet_names.push_back("EmptyHold"); //800
+    cell_sheet_names.push_back("TurnPipes"); //900
+    cell_sheet_names.push_back("EmptyTurn"); //1000
+    cell_sheet_names.push_back("Decorative"); //1100
+    cell_sheet_names.push_back("Players"); //1200
+    cell_sheet_names.push_back("Door"); //1300
+    cell_sheet_names.push_back("Enemy"); //1400
+
     vector<CellSheet> cell_sheets = make_cell_sheets(cell_sheet_names);
-
-    bitmap bitmap_players = bitmap_named("Players");
-    CellSheet player_type(bitmap_players, "Players", 908);
-    cell_sheets.push_back(player_type);
-
-    bitmap bitmap_door = bitmap_named("Door");
-    CellSheet door_type(bitmap_door, "Door", 807);
-    cell_sheets.push_back(door_type);
-
-    bitmap bitmap_roach = bitmap_named("Roach");
-    CellSheet roach_type(bitmap_roach, "Roach", 706);
-    cell_sheets.push_back(roach_type);
-
 
     int cell_sheet_selection = 0;
 
