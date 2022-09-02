@@ -1,5 +1,6 @@
 #include "splashkit.h"
 
+#pragma once
 class Tile
 {
     private:
@@ -62,6 +63,14 @@ class Tile
                 }
             }
         };
+
+        void load_tile(int value, int tile_selected, string type, bitmap current_bitmap)
+        {
+            this->current_bitmap = current_bitmap;
+            this->type = type;
+            this->value = value;
+            this->current_opts.draw_cell = tile_selected;
+        }
 
         int get_value()
         {

@@ -1,6 +1,7 @@
 #include "splashkit.h"
 #include "tile.h"
 #include "cellsheet.h"
+#include "map.h"
 #include <fstream>
 #include <vector>
 
@@ -74,11 +75,14 @@ vector<CellSheet> make_cell_sheets(vector<string> cell_sheet_names)
     return cell_sheets;
 }
 
+
+
 int main(int argc, char *argv[])
 {
     load_resource_bundle("game_resources", "gameresources.txt");
     open_window("Level Design", SCREEN_WIDTH, SCREEN_HEIGHT);
     bool hud = true;
+    bool load = false;
 
     vector<string> cell_sheet_names;
     
@@ -103,6 +107,7 @@ int main(int argc, char *argv[])
     cell_sheet_names.push_back("Edge"); //1800
 
     vector<CellSheet> cell_sheets = make_cell_sheets(cell_sheet_names);
+    vector<string> files;
 
     int cell_sheet_selection = 0;
 
@@ -136,6 +141,14 @@ int main(int argc, char *argv[])
             
             if (args[i] == "-f") 
                 file_name = args[i + 1];
+
+            if (args[i] == "-load")
+            { 
+                load = true;
+                layers = std::stoi(args[i + 1]);
+                for (int j = 1; j < std::stoi(args[i + 1]) + 1; j++)
+                    files.push_back(args[i + 1 + j]);
+            }
         }
     }
     catch(const std::exception& e)
@@ -151,10 +164,41 @@ int main(int argc, char *argv[])
 
     vector<vector<vector<Tile>>> all_layers;
 
+    if(load)
+    {
+        //Assumes all layers are the same size
+        LevelOjectsMap layer_map(files[0], tile_size);
+        int width = layer_map.get_map_width();
+        int height = layer_map.get_map_height();
+
+        if(width > (SCREEN_WIDTH/tile_size))
+            extra_width += (width - SCREEN_WIDTH/tile_size) * tile_size;
+
+        if(height > (SCREEN_HEIGHT/tile_size))
+            extra_height += (height - SCREEN_HEIGHT/tile_size) * tile_size;
+    }
+
     for(int i = 0; i < layers; i++)
     {
         vector<vector<Tile>> tiles = make_layer(tile_size, cell_sheets[cell_sheet_selection].cells, extra_width, extra_height);
         all_layers.push_back(tiles);
+    }
+
+    if(load)
+    {
+        for(int i = 0; i < all_layers.size(); i++)
+        {
+            int offset = 0;
+            for(int j = 0; j < all_layers[i].size(); j++)
+            {
+                LevelOjectsMap layer_map(files[i], tile_size);
+                for(int k = 0; k < cell_sheets.size(); k++)
+                {
+                    all_layers[i] = layer_map.load_layer(all_layers[i], cell_sheets[k].type, cell_sheets[k].cells, offset);
+                    offset += 100;
+                }
+            }
+        }
     }
 
     while(!key_typed(ESCAPE_KEY))
